@@ -50,15 +50,48 @@ string Macro::GetLine()
 	return _line;
 }
 
+MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount ,const u_int _frameRate)
+{
+	int _indexBuffer1 = 1;
+	int _indexBuffer2;
+	Stream _stream;
+	Stream _streamBuffer1;
+	Stream _streamBuffer2;
+	while (true)
+	{
+		Sleep(_frameRate);
+		_streamBuffer1 = Stream(_folderPath, to_string(_indexBuffer1) + _filePath, _fileExtension);
+		_indexBuffer2 = ((_indexBuffer1 + 1) % _frameCount);
+		_streamBuffer2 = Stream(_folderPath, to_string(_indexBuffer2) + _filePath, _fileExtension);
+
+		_stream = _streamBuffer1;
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0 });
+		_streamBuffer1.DisplayText();
+
+		_stream = _streamBuffer2;
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0 });
+		_stream.DisplayText();
+
+		_indexBuffer1 = ((_indexBuffer2 + 1) % _frameCount);
+		if (_kbhit())break;
+	}
+}
+
 
 Macro::Stream::Stream()
 {
+	folderPath = "";
+	filePath = "";
+	fileExtension = "";
 	filePath = "";
 }
 
 Macro::Stream::Stream(const string& _folderPath, const string& _filePath, const string& _fileExtension)
 {
-	filePath = _folderPath + _filePath + "." + _fileExtension;
+	folderPath = _folderPath;
+	fileName = _filePath;
+	fileExtension = _fileExtension;
+	filePath = folderPath + fileName + "." + fileExtension;
 }
 
 Macro::Stream::~Stream()
@@ -81,9 +114,21 @@ void Macro::Stream::DisplayText()
 	if (!DoesPathExist(filePath)) return;
 
 	ifstream _stream = ifstream(filePath);
+	string _file;
 	string _line;
 	while (getline(_stream, _line))
 	{
 		cout << _line << endl;
 	}
+}
+
+MACROLIBRARY__API void Macro::Stream::CreateFilesForGif(const u_int _frameCount)
+{
+ 	for (u_int _index = 0; _index < _frameCount; _index++)
+	{
+		string _filePath = folderPath + to_string(_index+1) + filePath + "." + fileExtension;
+		ofstream _stream = ofstream(_filePath);
+		_stream << "";
+	}
+	
 }

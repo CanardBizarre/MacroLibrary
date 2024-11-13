@@ -41,9 +41,12 @@ namespace Macro
 	MACROLIBRARY__API int GetRandomNumberInRange(const int _max, const int _min = 0);
 	MACROLIBRARY__API int GetInt();
 	MACROLIBRARY__API string GetLine();
-	
+	MACROLIBRARY__API void PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const u_int _frameRate);
 	class  Stream
 	{
+		string folderPath;
+		string fileName;
+		string fileExtension;
 		string filePath;
 
 	public:
@@ -56,6 +59,7 @@ namespace Macro
 
 	public:
 		MACROLIBRARY__API void DisplayText();
+		MACROLIBRARY__API void CreateFilesForGif(const u_int _frameCount);
 
 	};
 };
