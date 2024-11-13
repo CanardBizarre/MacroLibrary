@@ -58,7 +58,7 @@ namespace Macro
 		bool DoesPathExist(const string& _filePath);
 
 	public:
-		MACROLIBRARY__API void DisplayText();
+		MACROLIBRARY__API void DisplayAllFile();
 		MACROLIBRARY__API void CreateFilesForGif(const u_int _frameCount);
 
 	};

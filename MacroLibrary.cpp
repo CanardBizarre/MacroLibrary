@@ -57,20 +57,27 @@ MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _
 	Stream _stream;
 	Stream _streamBuffer1;
 	Stream _streamBuffer2;
+	HANDLE _consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO _info;
+	_info.dwSize = 100;
+	_info.bVisible = FALSE;
 	while (true)
 	{
+		
 		Sleep(_frameRate);
 		_streamBuffer1 = Stream(_folderPath, to_string(_indexBuffer1) + _filePath, _fileExtension);
 		_indexBuffer2 = (((_indexBuffer1 + 1) % (_frameCount + 1))) == 0 ? 1 : _indexBuffer1 + 1;
 		_streamBuffer2 = Stream(_folderPath, to_string(_indexBuffer2) + _filePath, _fileExtension);
 
 		_stream = _streamBuffer1;
-		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0 });
-		_streamBuffer1.DisplayText();
+		SetConsoleCursorInfo(_consoleHandle, &_info);
+		SetConsoleCursorPosition(_consoleHandle, { 0, 0 });
+		_streamBuffer1.DisplayAllFile();
 
 		_stream = _streamBuffer2;
-		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0 });
-		_stream.DisplayText();
+		SetConsoleCursorInfo(_consoleHandle, &_info);
+		SetConsoleCursorPosition(_consoleHandle, { 0, 0 });
+		_stream.DisplayAllFile();
 
 		_indexBuffer1 = (((_indexBuffer2 + 1) % (_frameCount + 1))) == 0 ? 1 : _indexBuffer2 + 1;
 		if (_kbhit())break;
@@ -109,7 +116,7 @@ bool Macro::Stream::DoesPathExist(const string& _filePath)
 	return true;
 }
 
-void Macro::Stream::DisplayText()
+void Macro::Stream::DisplayAllFile()
 {
 	if (!DoesPathExist(filePath)) return;
 
@@ -118,8 +125,9 @@ void Macro::Stream::DisplayText()
 	string _line;
 	while (getline(_stream, _line))
 	{
-		cout << _line << endl;
+		_file += _line + "\n";
 	}
+	DISPLAY(_file, false);
 }
 
 MACROLIBRARY__API void Macro::Stream::CreateFilesForGif(const u_int _frameCount)
