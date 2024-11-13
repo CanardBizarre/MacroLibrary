@@ -61,7 +61,7 @@ MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _
 	{
 		Sleep(_frameRate);
 		_streamBuffer1 = Stream(_folderPath, to_string(_indexBuffer1) + _filePath, _fileExtension);
-		_indexBuffer2 = ((_indexBuffer1 + 1) % _frameCount);
+		_indexBuffer2 = (((_indexBuffer1 + 1) % (_frameCount + 1))) == 0 ? 1 : _indexBuffer1 + 1;
 		_streamBuffer2 = Stream(_folderPath, to_string(_indexBuffer2) + _filePath, _fileExtension);
 
 		_stream = _streamBuffer1;
@@ -72,7 +72,7 @@ MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0 });
 		_stream.DisplayText();
 
-		_indexBuffer1 = ((_indexBuffer2 + 1) % _frameCount);
+		_indexBuffer1 = (((_indexBuffer2 + 1) % (_frameCount + 1))) == 0 ? 1 : _indexBuffer2 + 1;
 		if (_kbhit())break;
 	}
 }
