@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "MacroLibrary.h"
+#include "Color.h"
 
 void Macro::Config()
 {
@@ -50,40 +51,99 @@ string Macro::GetLine()
 	return _line;
 }
 
-MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount ,const u_int _frameRate)
+MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount ,const u_int _frameRate, const bool _invertColor)
 {
-	int _indexBuffer1 = 1;
-	int _indexBuffer2;
-	Stream _stream;
-	Stream _streamBuffer1;
-	Stream _streamBuffer2;
+	string** _allFrame = GetAllFrame(_folderPath, _filePath, _fileExtension, _frameCount, _invertColor);
+	int _index = 0;
 	HANDLE _consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO _info;
 	_info.dwSize = 100;
 	_info.bVisible = FALSE;
+	string _frame1 = *_allFrame[_index];
+	string _frame2;
 	while (true)
 	{
-		
+		SetConsoleCursorInfo(_consoleHandle, &_info);
+
 		Sleep(_frameRate);
-		_streamBuffer1 = Stream(_folderPath, to_string(_indexBuffer1) + _filePath, _fileExtension);
-		_indexBuffer2 = (((_indexBuffer1 + 1) % (_frameCount + 1))) == 0 ? 1 : _indexBuffer1 + 1;
-		_streamBuffer2 = Stream(_folderPath, to_string(_indexBuffer2) + _filePath, _fileExtension);
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0});
+		printf("%s", _frame1.c_str());
 
-		_stream = _streamBuffer1;
-		SetConsoleCursorInfo(_consoleHandle, &_info);
-		SetConsoleCursorPosition(_consoleHandle, { 0, 0 });
-		_streamBuffer1.DisplayAllFile();
 
-		_stream = _streamBuffer2;
-		SetConsoleCursorInfo(_consoleHandle, &_info);
-		SetConsoleCursorPosition(_consoleHandle, { 0, 0 });
-		_stream.DisplayAllFile();
+		_index = (((_index + 1) % (_frameCount - 1))) == 0 ? 1 : _index + 1;
+		_frame2 = *_allFrame[_index];
 
-		_indexBuffer1 = (((_indexBuffer2 + 1) % (_frameCount + 1))) == 0 ? 1 : _indexBuffer2 + 1;
+		_index = (((_index + 1) % (_frameCount- 1))) == 0 ? 1 : _index + 1;
+		_frame1 = *_allFrame[_index];
+
+		Sleep(_frameRate);
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0});
+		printf("%s", _frame2.c_str());
+
 		if (_kbhit())break;
 	}
+	for (u_int _index = 0; _index < _frameCount; _index++)
+	{
+		delete _allFrame[_index];
+	}
+	delete[] _allFrame;
 }
 
+MACROLIBRARY__API void Macro::PlayYoshiGif()
+{
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\YoshiGif\\", "_YoshiAscii", "txt", 20, 90);
+}
+
+MACROLIBRARY__API void Macro::PlayToothlessGif()
+{
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\ToothlessGif\\", "_ToothlessAscii", "txt", 223, 45, true);;
+}
+
+MACROLIBRARY__API string** Macro::GetAllFrame(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const bool _invertColor)
+{
+	u_int _stringArrayCount = 0;
+	string** _stringArray = new string*[_frameCount];
+	Stream _stream;
+	for (u_int _index = 0; _index < _frameCount; _index++)
+	{
+		_stream = Stream(_folderPath, to_string(_index + 1) + _filePath, _fileExtension);
+		string* _frame = new string(_stream.GetFrame(_invertColor));
+		_stringArray[_index] = _frame;
+	}
+	return _stringArray;
+}
+
+MACROLIBRARY__API void Macro::PushFrame(string**& _stringArray, u_int& _stringArrayCount,  string* _frame)
+{
+	string** _dupeArray = new string*[_stringArrayCount + 1];
+	for (u_int _index = 0; _index < _stringArrayCount; _index++)
+	{
+		_dupeArray[_index] = _stringArray[_index];
+	}
+	_dupeArray[_stringArrayCount] = _frame;
+	_stringArrayCount++;
+	delete[] _stringArray;
+	_stringArray = _dupeArray;
+}
+
+
+MACROLIBRARY__API string Macro::Stream::GetFrame(const bool _invertColor)
+{
+	if (!DoesPathExist(filePath))
+	{
+		return "";
+	}
+	string _color;
+	if (_invertColor) _color = BLACK_INTENSE_TEXT + string(WHITE_INTENSE_BG);
+	ifstream _stream = ifstream(filePath);
+	string _file = _color;
+	string _line;
+	while (getline(_stream, _line))
+	{
+		_file += _line + "\n";
+	}
+	return _file + RESET;
+}
 
 Macro::Stream::Stream()
 {
