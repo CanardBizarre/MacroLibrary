@@ -16,6 +16,7 @@
 #include <thread>
 #include <limits>
 #include <cmath>
+#include <cwchar>
 
 using namespace std;
 using namespace std::chrono_literals;
@@ -46,6 +47,8 @@ namespace Macro
 	MACROLIBRARY__API void PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const u_int _frameRate, const bool _invertColor = false);
 	MACROLIBRARY__API void PlayYoshiGif();
 	MACROLIBRARY__API void PlayToothlessGif();
+	MACROLIBRARY__API void PlayBadApple();
+	MACROLIBRARY__API void PlayRickRoll();
 	MACROLIBRARY__API string** GetAllFrame(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const bool _invertColor);
 	MACROLIBRARY__API void PushFrame(string**& _stringArray, u_int& _stringArrayCount, string* _frame);
 

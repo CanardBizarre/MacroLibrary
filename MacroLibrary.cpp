@@ -51,8 +51,20 @@ string Macro::GetLine()
 	return _line;
 }
 
+/// <summary>
+/// Le truc qui permet de jouer le gif
+/// </summary>
+/// <param name="_folderPath"></param>
+/// <param name="_filePath"></param>
+/// <param name="_fileExtension"></param>
+/// <param name="_frameCount"></param>
+/// <param name="_frameRate"></param>
+/// <param name="_invertColor"></param>
+/// <returns></returns>
 MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount ,const u_int _frameRate, const bool _invertColor)
 {
+	HWND _hwnd = GetForegroundWindow();
+	ShowWindow(_hwnd, SW_MAXIMIZE);
 	string** _allFrame = GetAllFrame(_folderPath, _filePath, _fileExtension, _frameCount, _invertColor);
 	int _index = 0;
 	HANDLE _consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -60,13 +72,13 @@ MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _
 	_info.dwSize = 100;
 	_info.bVisible = FALSE;
 	string _frame1 = *_allFrame[_index];
-	string _frame2;
+	string _frame2; 
 	while (true)
 	{
 		SetConsoleCursorInfo(_consoleHandle, &_info);
 
 		Sleep(_frameRate);
-		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0});
+		SetConsoleCursorPosition(_consoleHandle, { 0, 0});
 		printf("%s", _frame1.c_str());
 
 
@@ -77,11 +89,12 @@ MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _
 		_frame1 = *_allFrame[_index];
 
 		Sleep(_frameRate);
-		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0});
+		SetConsoleCursorPosition(_consoleHandle, { 0, 0});
 		printf("%s", _frame2.c_str());
 
 		if (_kbhit())break;
 	}
+
 	for (u_int _index = 0; _index < _frameCount; _index++)
 	{
 		delete _allFrame[_index];
@@ -89,16 +102,45 @@ MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _
 	delete[] _allFrame;
 }
 
+/// <summary>
+/// Voici des exemples de gif
+/// </summary>
+/// il faut le path,
+/// le nom en commun de tous les fichiers et l'extension,
+/// combien de frame le gif fait et le temps de pause entre chaque frame, 
+/// et un bool qui permet d'inverser les couleurs
+/// <returns></returns>
+
 MACROLIBRARY__API void Macro::PlayYoshiGif()
 {
-	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\YoshiGif\\", "_YoshiAscii", "txt", 20, 90);
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\YoshiGif\\", "_YoshiAscii", "txt", 20, 100);
 }
 
 MACROLIBRARY__API void Macro::PlayToothlessGif()
 {
-	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\ToothlessGif\\", "_ToothlessAscii", "txt", 223, 45, true);;
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\ToothlessGif\\", "_ToothlessAscii", "txt", 223, 45, true);
 }
 
+MACROLIBRARY__API void Macro::PlayBadApple()
+{
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\BadApple\\", "_BadApple", "txt", 6569, 45, true);
+}
+
+MACROLIBRARY__API void Macro::PlayRickRoll()
+{
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\RickRoll\\", "", "txt", 51, 45, true);
+}
+
+
+/// <summary>
+/// Permte de récuper un tableu de string
+/// </summary>
+/// <param name="_folderPath"></param>
+/// <param name="_filePath"></param>
+/// <param name="_fileExtension"></param>
+/// <param name="_frameCount"></param>
+/// <param name="_invertColor"></param>
+/// <returns></returns>
 MACROLIBRARY__API string** Macro::GetAllFrame(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const bool _invertColor)
 {
 	u_int _stringArrayCount = 0;
@@ -113,6 +155,13 @@ MACROLIBRARY__API string** Macro::GetAllFrame(const string& _folderPath, const s
 	return _stringArray;
 }
 
+/// <summary>
+/// sert a queud
+/// </summary>
+/// <param name="_stringArray"></param>
+/// <param name="_stringArrayCount"></param>
+/// <param name="_frame"></param>
+/// <returns></returns>
 MACROLIBRARY__API void Macro::PushFrame(string**& _stringArray, u_int& _stringArrayCount,  string* _frame)
 {
 	string** _dupeArray = new string*[_stringArrayCount + 1];
@@ -126,7 +175,11 @@ MACROLIBRARY__API void Macro::PushFrame(string**& _stringArray, u_int& _stringAr
 	_stringArray = _dupeArray;
 }
 
-
+/// <summary>
+/// Permet de convertir tous les frames txt en string
+/// </summary>
+/// <param name="_invertColor"></param>
+/// <returns></returns>
 MACROLIBRARY__API string Macro::Stream::GetFrame(const bool _invertColor)
 {
 	if (!DoesPathExist(filePath))
@@ -134,7 +187,7 @@ MACROLIBRARY__API string Macro::Stream::GetFrame(const bool _invertColor)
 		return "";
 	}
 	string _color;
-	if (_invertColor) _color = BLACK_INTENSE_TEXT + string(WHITE_INTENSE_BG);
+	if (_invertColor) _color = BLACK_TEXT + string(WHITE_INTENSE_BG);
 	ifstream _stream = ifstream(filePath);
 	string _file = _color;
 	string _line;
