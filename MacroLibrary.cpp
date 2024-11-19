@@ -113,22 +113,17 @@ MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _
 
 MACROLIBRARY__API void Macro::PlayYoshiGif()
 {
-	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\YoshiGif\\", "_YoshiAscii", "txt", 20, 100);
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Librairies\\MacroLibrary\\YoshiGif\\", "_YoshiAscii", "txt", 20, 100);
 }
 
 MACROLIBRARY__API void Macro::PlayToothlessGif()
 {
-	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\ToothlessGif\\", "_ToothlessAscii", "txt", 223, 45, true);
-}
-
-MACROLIBRARY__API void Macro::PlayBadApple()
-{
-	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\BadApple\\", "_BadApple", "txt", 6569, 45, true);
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Librairies\\MacroLibrary\\ToothlessGif\\", "_ToothlessAscii", "txt", 223, 45, true);
 }
 
 MACROLIBRARY__API void Macro::PlayRickRoll()
 {
-	return PlayGif("D:\\HUYNH_Vuong-Tu\\Libraries\\MacroLibrary\\RickRoll\\", "", "txt", 51, 45, true);
+	return PlayGif("D:\\HUYNH_Vuong-Tu\\Librairies\\MacroLibrary\\RickRoll\\", "", "txt", 51, 45, true);
 }
 
 
