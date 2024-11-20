@@ -4,8 +4,9 @@
 
 void Macro::Config()
 {
-	locale::global(locale("fr_FR"));
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	SetConsoleOutputCP(CP_UTF8);
+	locale::global(locale("fr_FR"));
 }
 
 int Macro::GetRandomNumberInRange(const int _max, const int _min)
