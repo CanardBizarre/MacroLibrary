@@ -32,7 +32,6 @@ using namespace this_thread;
                cin.ignore((numeric_limits<streamsize>::max)(), '\n');
 
 typedef unsigned int u_int;
-
 class  Stream;
 
 namespace Macro
@@ -44,12 +43,17 @@ namespace Macro
 	MACROLIBRARY__API int GetRandomNumberInRange(const int _max, const int _min = 0);
 	MACROLIBRARY__API int GetInt();
 	MACROLIBRARY__API string GetLine();
+};
+
+namespace Gif
+{
 	MACROLIBRARY__API void PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const u_int _frameRate, const bool _invertColor = false);
-	MACROLIBRARY__API void PlayYoshiGif();
 	MACROLIBRARY__API void PlayToothlessGif();
+	MACROLIBRARY__API void PlayYoshiGif();
 	MACROLIBRARY__API void PlayRickRoll();
 	MACROLIBRARY__API string** GetAllFrame(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const bool _invertColor);
 	MACROLIBRARY__API void PushFrame(string**& _stringArray, u_int& _stringArrayCount, string* _frame);
+
 
 	class Stream
 	{
@@ -72,6 +76,7 @@ namespace Macro
 		MACROLIBRARY__API void CreateFilesForGif(const u_int _frameCount);
 
 	};
+
 };
 
 namespace LinkedChain
@@ -356,16 +361,65 @@ namespace LinkedChain
 		}
 
 		//==== Operator ====
-		LinkedList<Type>& operator [] (const SizeType& _index)
+		Node<Type>* operator [] (const SizeType& _index)
 		{
 			assert(IsValidIndex(_index) && string("L'index " + to_string(_index) + " n'est pas valide!").c_str);
 			return GetElementAtIndex(_index);
 		}
 	};
 
+	template<class Type, typename SizeType = u_int>
+	class PriorityQueue
+	{
+		LinkedList<Type, SizeType>* linkedList;
+
+	public:
+		PriorityQueue()
+		{
+			linkedList = new LinkedList<Type, SizeType>;
+		}
+
+		~PriorityQueue()
+		{
+			delete linkedList;
+		}
+	private:
+		void CheckInsertValue(Type _newValue)
+		{
+			SizeType _count = linkedList->GetSize();
+			for (SizeType _index = 0; _index < _count; _index++)
+			{
+				if (linkedList[_index]<= _newValue)  return linkedList->InsertAt(_index, _newValue);
+			}
+		}
+
+	public:
+		void InsertValue(Type _newValue)
+		{
+			SizeType _count = linkedList->GetSize();
+			if (_count == 0)
+			{
+				linkedList->AddFront(_newValue);
+			}
+			if (linkedList->GetFirst()->value < _newValue)
+			{
+				return linkedList->AddFront(_newValue);
+				
+			}
+			else if (linkedList->GetLast()->value > _newValue)
+			{
+				return linkedList->AddBack(_newValue);
+			}
+		}
+		void Display()
+		{
+			linkedList->Display();
+		}
+	
+	};
 };
 
-namespace Array
+namespace DynamicArray
 {
 	template<class T, typename SizeType = u_int>
 	class Array
@@ -379,12 +433,16 @@ namespace Array
 			return arraySize == 0;
 		}
 
-		inline bool IndexValid(const u_int _index)const
+		inline bool IndexValid(const SizeType& _index)const
 		{
 			return 0 <= _index && arraySize >= _index;
 		}
 
-
+	public:
+		inline T* GetT(const int _index)
+		{
+			return arrayT[_index];
+		}
 	public:
 		Array()
 		{
@@ -398,12 +456,11 @@ namespace Array
 			arrayT = new T * [arraySize];
 		}
 
-
 		~Array()
 		{
 			for (u_int _index = 0; _index < arraySize; _index++)
 			{
-				delete arrayT[arraySize];
+				delete arrayT[_index];
 			}
 			delete arrayT;
 		}
@@ -413,7 +470,7 @@ namespace Array
 	public:
 		void PushBack(T* _newValue)
 		{
-			T** _dupeArray = new T * [arraySize];
+			T** _dupeArray = new T * [arraySize + 1];
 			for (u_int _index = 0; _index < arraySize; _index++)
 			{
 				_dupeArray[_index] = arrayT[_index];
@@ -424,6 +481,134 @@ namespace Array
 			arrayT = _dupeArray;
 		}
 
+		void PushFront(T* _newValue, const SizeType& _indexToInsert)
+		{
+			T** _dupeArray = new T * [arraySize + 1];
+			bool _hasSkip = false;
+			for (u_int _index = 0; _index < arraySize + 1; _index++)
+			{
+				_dupeArray[_index] = arrayT[_index];
+				if (_indexToInsert == _index)
+				{
+					_dupeArray[_index] = _newValue;
+				}
+			}
+			arraySize++;
+			delete[] arrayT;
+			arrayT = _dupeArray;
+		}
+
+		void AddAt(T* _newValue, const u_int)
+		{
+			T** _dupeArray = new T * [arraySize + 1];
+			_dupeArray[0] = _newValue;
+			for (u_int _index = 0; _index < arraySize + 1; _index++)
+			{
+				_dupeArray[_index] = arrayT[_index];
+			}
+			arraySize++;
+			delete[] arrayT;
+			arrayT = _dupeArray;
+		}
+
 	};
-}
+
+	/*template<class T, typename SizeType = u_int>
+	class ArrayDouble
+	{
+		T*** arrayT;
+		SizeType row;
+		SizeType column;
+
+	private:
+		inline bool Isempty() const
+		{
+			return row == 0 && column == 0;
+		}
+
+		inline bool IndexRow(const SizeType& _index)const
+		{
+			return 0 <= _index && row >= _index;
+		}
+
+		inline bool IndexColumn(const SizeType& _index)const
+		{
+			return 0 <= _index && column >= _index;
+		}
+
+	public:
+		inline T* GetT(const int _index)
+		{
+			return arrayT[_index];
+		}
+	public:
+		ArrayDouble()
+		{
+			arraySize = 0;
+			arrayT = new T * [arraySize];
+		}
+
+		ArrayDouble(const initializer_list<T>& _list)
+		{
+			arraySize = 0;
+			arrayT = new T * [arraySize];
+		}
+
+		~ArrayDouble()
+		{
+			for (u_int _index = 0; _index < arraySize; _index++)
+			{
+				delete arrayT[_index];
+			}
+			delete arrayT;
+		}
+
+	private:
+
+	public:
+		void PushBack(T* _newValue)
+		{
+			T** _dupeArray = new T * [arraySize + 1];
+			for (u_int _index = 0; _index < arraySize; _index++)
+			{
+				_dupeArray[_index] = arrayT[_index];
+			}
+			_dupeArray[arraySize] = _newValue;
+			arraySize++;
+			delete[] arrayT;
+			arrayT = _dupeArray;
+		}
+
+		void PushFront(T* _newValue, const SizeType& _indexToInsert)
+		{
+			T** _dupeArray = new T * [arraySize + 1];
+			bool _hasSkip = false;
+			for (u_int _index = 0; _index < arraySize + 1; _index++)
+			{
+				_dupeArray[_index] = arrayT[_index];
+				if (_indexToInsert == _index)
+				{
+					_dupeArray[_index] = _newValue;
+				}
+			}
+			arraySize++;
+			delete[] arrayT;
+			arrayT = _dupeArray;
+		}
+
+		void AddAt(T* _newValue, const u_int)
+		{
+			T** _dupeArray = new T * [arraySize + 1];
+			_dupeArray[0] = _newValue;
+			for (u_int _index = 0; _index < arraySize + 1; _index++)
+			{
+				_dupeArray[_index] = arrayT[_index];
+			}
+			arraySize++;
+			delete[] arrayT;
+			arrayT = _dupeArray;
+		}
+
+	};*/
+};
 

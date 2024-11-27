@@ -52,17 +52,7 @@ string Macro::GetLine()
 	return _line;
 }
 
-/// <summary>
-/// Le truc qui permet de jouer le gif
-/// </summary>
-/// <param name="_folderPath"></param>
-/// <param name="_filePath"></param>
-/// <param name="_fileExtension"></param>
-/// <param name="_frameCount"></param>
-/// <param name="_frameRate"></param>
-/// <param name="_invertColor"></param>
-/// <returns></returns>
-MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount ,const u_int _frameRate, const bool _invertColor)
+MACROLIBRARY__API void Gif::PlayGif(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount ,const u_int _frameRate, const bool _invertColor)
 {
 	HWND _hwnd = GetForegroundWindow();
 	ShowWindow(_hwnd, SW_MAXIMIZE);
@@ -103,41 +93,22 @@ MACROLIBRARY__API void Macro::PlayGif(const string& _folderPath, const string& _
 	delete[] _allFrame;
 }
 
-/// <summary>
-/// Voici des exemples de gif
-/// </summary>
-/// il faut le path,
-/// le nom en commun de tous les fichiers et l'extension,
-/// combien de frame le gif fait et le temps de pause entre chaque frame, 
-/// et un bool qui permet d'inverser les couleurs
-/// <returns></returns>
-
-MACROLIBRARY__API void Macro::PlayYoshiGif()
+MACROLIBRARY__API void Gif::PlayYoshiGif()
 {
 	return PlayGif("D:\\HUYNH_Vuong-Tu\\Librairies\\MacroLibrary\\YoshiGif\\", "_YoshiAscii", "txt", 20, 100);
 }
 
-MACROLIBRARY__API void Macro::PlayToothlessGif()
+MACROLIBRARY__API void Gif::PlayToothlessGif()
 {
 	return PlayGif("D:\\HUYNH_Vuong-Tu\\Librairies\\MacroLibrary\\ToothlessGif\\", "_ToothlessAscii", "txt", 223, 45, true);
 }
 
-MACROLIBRARY__API void Macro::PlayRickRoll()
+MACROLIBRARY__API void Gif::PlayRickRoll()
 {
 	return PlayGif("D:\\HUYNH_Vuong-Tu\\Librairies\\MacroLibrary\\RickRoll\\", "", "txt", 51, 45, true);
 }
 
-
-/// <summary>
-/// Permte de récuper un tableu de string
-/// </summary>
-/// <param name="_folderPath"></param>
-/// <param name="_filePath"></param>
-/// <param name="_fileExtension"></param>
-/// <param name="_frameCount"></param>
-/// <param name="_invertColor"></param>
-/// <returns></returns>
-MACROLIBRARY__API string** Macro::GetAllFrame(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const bool _invertColor)
+MACROLIBRARY__API string** Gif::GetAllFrame(const string& _folderPath, const string& _filePath, const string& _fileExtension, const u_int _frameCount, const bool _invertColor)
 {
 	u_int _stringArrayCount = 0;
 	string** _stringArray = new string*[_frameCount];
@@ -151,14 +122,7 @@ MACROLIBRARY__API string** Macro::GetAllFrame(const string& _folderPath, const s
 	return _stringArray;
 }
 
-/// <summary>
-/// sert a queud
-/// </summary>
-/// <param name="_stringArray"></param>
-/// <param name="_stringArrayCount"></param>
-/// <param name="_frame"></param>
-/// <returns></returns>
-MACROLIBRARY__API void Macro::PushFrame(string**& _stringArray, u_int& _stringArrayCount,  string* _frame)
+MACROLIBRARY__API void Gif::PushFrame(string**& _stringArray, u_int& _stringArrayCount,  string* _frame)
 {
 	string** _dupeArray = new string*[_stringArrayCount + 1];
 	for (u_int _index = 0; _index < _stringArrayCount; _index++)
@@ -171,12 +135,7 @@ MACROLIBRARY__API void Macro::PushFrame(string**& _stringArray, u_int& _stringAr
 	_stringArray = _dupeArray;
 }
 
-/// <summary>
-/// Permet de convertir tous les frames txt en string
-/// </summary>
-/// <param name="_invertColor"></param>
-/// <returns></returns>
-MACROLIBRARY__API string Macro::Stream::GetFrame(const bool _invertColor)
+MACROLIBRARY__API string Gif::Stream::GetFrame(const bool _invertColor)
 {
 	if (!DoesPathExist(filePath))
 	{
@@ -194,7 +153,7 @@ MACROLIBRARY__API string Macro::Stream::GetFrame(const bool _invertColor)
 	return _file + RESET;
 }
 
-Macro::Stream::Stream()
+Gif::Stream::Stream()
 {
 	folderPath = "";
 	filePath = "";
@@ -202,7 +161,7 @@ Macro::Stream::Stream()
 	filePath = "";
 }
 
-Macro::Stream::Stream(const string& _folderPath, const string& _filePath, const string& _fileExtension)
+Gif::Stream::Stream(const string& _folderPath, const string& _filePath, const string& _fileExtension)
 {
 	folderPath = _folderPath;
 	fileName = _filePath;
@@ -210,11 +169,11 @@ Macro::Stream::Stream(const string& _folderPath, const string& _filePath, const 
 	filePath = folderPath + fileName + "." + fileExtension;
 }
 
-Macro::Stream::~Stream()
+Gif::Stream::~Stream()
 {
 }
 
-bool Macro::Stream::DoesPathExist(const string& _filePath)
+bool Gif::Stream::DoesPathExist(const string& _filePath)
 {
 	ifstream _stream = ifstream(_filePath);
 	if (!_stream)
@@ -225,7 +184,7 @@ bool Macro::Stream::DoesPathExist(const string& _filePath)
 	return true;
 }
 
-void Macro::Stream::DisplayAllFile()
+void Gif::Stream::DisplayAllFile()
 {
 	if (!DoesPathExist(filePath)) return;
 
@@ -239,7 +198,7 @@ void Macro::Stream::DisplayAllFile()
 	DISPLAY(_file, false);
 }
 
-MACROLIBRARY__API void Macro::Stream::CreateFilesForGif(const u_int _frameCount)
+MACROLIBRARY__API void Gif::Stream::CreateFilesForGif(const u_int _frameCount)
 {
  	for (u_int _index = 0; _index < _frameCount; _index++)
 	{
@@ -249,3 +208,5 @@ MACROLIBRARY__API void Macro::Stream::CreateFilesForGif(const u_int _frameCount)
 	}
 	
 }
+
+
