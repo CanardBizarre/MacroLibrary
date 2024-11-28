@@ -81,8 +81,8 @@ namespace Gif
 
 namespace LinkedChain
 {
-	template<class T>
-	struct  Node
+	template<typename T>
+	struct Node
 	{
 		T value;
 		Node<T>* next;
@@ -107,9 +107,23 @@ namespace LinkedChain
 		}
 		~Node()
 		{
-			delete next;
+			
 		}
 
+		bool operator > (const Node& _other) const
+		{
+			return value > _other.value;
+		}
+
+		bool operator < (const Node& _other) const
+		{
+			return value < _other.value;
+		}
+
+		bool operator == (Node* _other) const
+		{
+			return value == _other->value;
+		}
 	};
 
 	template<class Type, typename SizeType = u_int>
@@ -120,16 +134,16 @@ namespace LinkedChain
 		SizeType count;
 
 	private:
-		inline bool IsEmpty() const
-		{
-			return count == 0;
-		}
-		inline bool IsIndexValid(const u_int _index)const 
+		inline bool IsIndexValid(const SizeType _index)const
 		{
 			return 0 <= _index && count >= _index;
 		}
 
 	public:
+		inline bool IsEmpty() const
+		{
+			return count == 0;
+		}
 		inline SizeType GetSize() const
 		{
 			return count;
@@ -143,7 +157,14 @@ namespace LinkedChain
 
 			return last;
 		}
-
+		inline Node<Type>* begin()const 
+		{
+			return first;
+		}
+		inline Node<Type>* end()const
+		{
+			return last;
+		}
 
 	public:
 		LinkedList()
@@ -251,8 +272,7 @@ namespace LinkedChain
 				cerr << "ERROR => empty list";
 				return;
 			}
-			count--;
-			if (count == 1)
+			if (count-- == 1)
 			{
 				delete last;
 				return;
@@ -325,6 +345,19 @@ namespace LinkedChain
 			}*/
 		}
 
+		//==== Search ====
+
+		bool IsValueIn(const Type& _value)
+		{
+			Node <Type>* _current = first;
+			for (u_int _index = 0; _index < count && _current->next; _index++)
+			{
+				if (_current->value == _value) return true;
+				_current = _current->next;
+			}
+			return false;
+		}
+
 		//==== Display ====
 		void Display()
 		{
@@ -363,60 +396,95 @@ namespace LinkedChain
 		//==== Operator ====
 		Node<Type>* operator [] (const SizeType& _index)
 		{
-			assert(IsValidIndex(_index) && string("L'index " + to_string(_index) + " n'est pas valide!").c_str);
+			/*assert(IsIndexValid(_index) && string("L'index " + to_string(_index) + " n'est pas valide!").c_str);*/
 			return GetElementAtIndex(_index);
 		}
-	};
 
-	template<class Type, typename SizeType = u_int>
-	class PriorityQueue
-	{
-		LinkedList<Type, SizeType>* linkedList;
-
-	public:
-		PriorityQueue()
-		{
-			linkedList = new LinkedList<Type, SizeType>;
-		}
-
-		~PriorityQueue()
-		{
-			delete linkedList;
-		}
+	// PriorityQueu
 	private:
-		void CheckInsertValue(Type _newValue)
+		void CheckInsertValue(const Type& _newValue)
 		{
-			SizeType _count = linkedList->GetSize();
+			Node <Type>* _newNode = new Node<Type>(_newValue);
+			SizeType _count = GetSize();
 			for (SizeType _index = 0; _index < _count; _index++)
 			{
-				if (linkedList[_index]<= _newValue)  return linkedList->InsertAt(_index, _newValue);
+				if (GetElementAtIndex(_index) <= _newNode)
+				{
+					delete _newNode;
+					return InsertAt(_index, _newValue);
+				}
 			}
 		}
 
 	public:
-		void InsertValue(Type _newValue)
+		void InsertValue(const Type& _newValue)
 		{
-			SizeType _count = linkedList->GetSize();
+			Node <Type>* _newNode = new Node<Type>(_newValue);
+			SizeType _count = GetSize();
 			if (_count == 0)
 			{
-				linkedList->AddFront(_newValue);
+				delete _newNode;
+				 return CreatNewLinkedList(_newValue);
 			}
-			if (linkedList->GetFirst()->value < _newValue)
+			if (first < _newNode)
 			{
-				return linkedList->AddFront(_newValue);
-				
+				delete _newNode;
+				return AddFront(_newValue);
+
 			}
-			else if (linkedList->GetLast()->value > _newValue)
+			else if (last > _newNode)
 			{
-				return linkedList->AddBack(_newValue);
+				delete _newNode;
+				return AddBack(_newValue);
+			}
+			else
+			{
+				delete _newNode;
+				 return CheckInsertValue(_newValue);
 			}
 		}
-		void Display()
-		{
-			linkedList->Display();
-		}
-	
 	};
+
+	//template<class Type, typename SizeType = u_int>
+	//class PriorityQueue
+	//{
+	//	LinkedList<Type, SizeType>* linkedList;
+	//public:
+	//	Type begin()
+	//	{
+	//		return linkedList.begin();
+	//	}
+
+	//	Type end()
+	//	{
+	//		return linkedList.end();
+	//	}
+	//public: 
+	//	inline Type GetLowest()
+	//	{
+	//		return linkedList->GetLast(); 
+	//	}
+	//public:
+	//	PriorityQueue()
+	//	{
+	//		linkedList = new LinkedList<Type, SizeType>;
+	//	}
+
+	//	~PriorityQueue()
+	//	{
+	//		delete linkedList;
+	//	}
+	//	void Display()
+	//	{
+	//		linkedList->Display();
+	//	}
+
+	//	void PopFront()
+	//	{
+	//		linkedList->PopFront(); 
+	//	}
+	//
+	//};
 };
 
 namespace DynamicArray
@@ -439,10 +507,27 @@ namespace DynamicArray
 		}
 
 	public:
-		inline T* GetT(const int _index)
+		inline SizeType GetSize() const
+		{
+			return arraySize;
+		}
+
+
+		inline T* GetT(const int _index) const 
 		{
 			return arrayT[_index];
 		}
+
+		inline T* begin() const
+		{
+			return arrayT[0];
+		}
+
+		inline T* end() const
+		{
+			return arrayT[arraySize];
+		}
+
 	public:
 		Array()
 		{
@@ -450,15 +535,17 @@ namespace DynamicArray
 			arrayT = new T * [arraySize];
 		}
 
-		Array(const initializer_list<T>& _list)
+		Array(const initializer_list<T*>& _list)
 		{
-			arraySize = 0;
-			arrayT = new T * [arraySize];
+			for (T* _element : _list)
+			{
+				PushBack(_element);
+			}
 		}
 
 		~Array()
 		{
-			for (u_int _index = 0; _index < arraySize; _index++)
+			for (SizeType _index = 0; _index < arraySize; _index++)
 			{
 				delete arrayT[_index];
 			}
@@ -481,17 +568,13 @@ namespace DynamicArray
 			arrayT = _dupeArray;
 		}
 
-		void PushFront(T* _newValue, const SizeType& _indexToInsert)
+		void PushFront(T* _newValue)
 		{
 			T** _dupeArray = new T * [arraySize + 1];
-			bool _hasSkip = false;
-			for (u_int _index = 0; _index < arraySize + 1; _index++)
+			_dupeArray[0] = _newValue;
+			for (u_int _index = 1; _index < arraySize + 1; _index++)
 			{
 				_dupeArray[_index] = arrayT[_index];
-				if (_indexToInsert == _index)
-				{
-					_dupeArray[_index] = _newValue;
-				}
 			}
 			arraySize++;
 			delete[] arrayT;
@@ -510,105 +593,6 @@ namespace DynamicArray
 			delete[] arrayT;
 			arrayT = _dupeArray;
 		}
-
 	};
-
-	/*template<class T, typename SizeType = u_int>
-	class ArrayDouble
-	{
-		T*** arrayT;
-		SizeType row;
-		SizeType column;
-
-	private:
-		inline bool Isempty() const
-		{
-			return row == 0 && column == 0;
-		}
-
-		inline bool IndexRow(const SizeType& _index)const
-		{
-			return 0 <= _index && row >= _index;
-		}
-
-		inline bool IndexColumn(const SizeType& _index)const
-		{
-			return 0 <= _index && column >= _index;
-		}
-
-	public:
-		inline T* GetT(const int _index)
-		{
-			return arrayT[_index];
-		}
-	public:
-		ArrayDouble()
-		{
-			arraySize = 0;
-			arrayT = new T * [arraySize];
-		}
-
-		ArrayDouble(const initializer_list<T>& _list)
-		{
-			arraySize = 0;
-			arrayT = new T * [arraySize];
-		}
-
-		~ArrayDouble()
-		{
-			for (u_int _index = 0; _index < arraySize; _index++)
-			{
-				delete arrayT[_index];
-			}
-			delete arrayT;
-		}
-
-	private:
-
-	public:
-		void PushBack(T* _newValue)
-		{
-			T** _dupeArray = new T * [arraySize + 1];
-			for (u_int _index = 0; _index < arraySize; _index++)
-			{
-				_dupeArray[_index] = arrayT[_index];
-			}
-			_dupeArray[arraySize] = _newValue;
-			arraySize++;
-			delete[] arrayT;
-			arrayT = _dupeArray;
-		}
-
-		void PushFront(T* _newValue, const SizeType& _indexToInsert)
-		{
-			T** _dupeArray = new T * [arraySize + 1];
-			bool _hasSkip = false;
-			for (u_int _index = 0; _index < arraySize + 1; _index++)
-			{
-				_dupeArray[_index] = arrayT[_index];
-				if (_indexToInsert == _index)
-				{
-					_dupeArray[_index] = _newValue;
-				}
-			}
-			arraySize++;
-			delete[] arrayT;
-			arrayT = _dupeArray;
-		}
-
-		void AddAt(T* _newValue, const u_int)
-		{
-			T** _dupeArray = new T * [arraySize + 1];
-			_dupeArray[0] = _newValue;
-			for (u_int _index = 0; _index < arraySize + 1; _index++)
-			{
-				_dupeArray[_index] = arrayT[_index];
-			}
-			arraySize++;
-			delete[] arrayT;
-			arrayT = _dupeArray;
-		}
-
-	};*/
 };
 
