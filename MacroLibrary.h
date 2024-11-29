@@ -107,7 +107,7 @@ namespace LinkedChain
 		}
 		~Node()
 		{
-			
+			/*delete first;*/
 		}
 
 		bool operator > (const Node& _other) const
@@ -321,13 +321,12 @@ namespace LinkedChain
 		{
 			if (IsEmpty())
 			{
-				DISPLAY("La liste est vide",true);
 				return;
 			}
 
-			delete first;
+			/*delete first;*/
 
-			/*Node<Type>* _current = first;
+			Node<Type>* _current = first;
 			while (true)
 			{
 				_current = _current->next == nullptr ? last : _current->next;
@@ -342,7 +341,7 @@ namespace LinkedChain
 					return;
 				}
 
-			}*/
+			}
 		}
 
 		//==== Search ====
@@ -419,27 +418,23 @@ namespace LinkedChain
 	public:
 		void InsertValue(const Type& _newValue)
 		{
-			Node <Type>* _newNode = new Node<Type>(_newValue);
 			SizeType _count = GetSize();
 			if (_count == 0)
 			{
-				delete _newNode;
 				 return CreatNewLinkedList(_newValue);
 			}
-			if (first < _newNode)
+			if (first->value < _newValue)
+
 			{
-				delete _newNode;
 				return AddFront(_newValue);
 
 			}
-			else if (last > _newNode)
+			else if (last->value > _newValue)
 			{
-				delete _newNode;
 				return AddBack(_newValue);
 			}
 			else
 			{
-				delete _newNode;
 				 return CheckInsertValue(_newValue);
 			}
 		}
